@@ -1,1 +1,1 @@
-web: node dist/index.js localhost:5000
+web: node dist/index.js
