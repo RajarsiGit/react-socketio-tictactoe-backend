@@ -40,6 +40,6 @@ io.on('connection', socket => {
     });
 });
 
-httpServer.listen(5000, 'localhost', () => {
-    console.log('listening on http://localhost:5000');
+httpServer.listen(() => {
+    console.log('Listening...');
 });
