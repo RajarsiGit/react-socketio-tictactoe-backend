@@ -5,6 +5,7 @@ import socketio from 'socket.io';
 
 const app = express();
 app.use(cors());
+const PORT = process.env.PORT || 5000;
 
 const httpServer = new http.Server(app)
 const io = new socketio.Server(httpServer, {
@@ -40,6 +41,6 @@ io.on('connection', socket => {
     });
 });
 
-httpServer.listen(() => {
-    console.log('Listening...');
+httpServer.listen(PORT, () => {
+    console.log('Listeningon PORT: ' + PORT);
 });
