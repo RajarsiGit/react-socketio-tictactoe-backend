@@ -21,12 +21,14 @@ const io = new socketio.Server(httpServer, {
     }
 });
 
-const getRoom = (socket: {id: string}, room: { id: string[]; room: string; }[]): string[] => {
-    return room.map((room) => {
-        if (room.id[0] === socket.id || room.id[1] === socket.id) {
-            return room.room;
+const roomExists = (p_room: string): boolean => {
+    let exists: boolean = false;
+    room.forEach((room) => {
+        if (room.room === p_room) {
+            exists === true;
         }
     });
+    return exists;
 }
 
 app.get('/', (_req, res) => {
@@ -35,29 +37,37 @@ app.get('/', (_req, res) => {
 
 io.on('connection', socket => {
     console.log('User ' + socket.id + ' is trying to connect...')
-    if (room[i].id.length === 2) {
-        i++;
-        room.push({
-            room: 'room_' + i.toString(),
-            id: []
-        });
-        room[i].id.push(socket.id);
-        socket.join(room[i].room);
-        console.log('User ' + socket.id + ' is connected to room: ' + room[i].room);
-    } else {
-        room[i].room = 'room_' + i.toString();
-        room[i].id.push(socket.id);
-        socket.join('room_' + i.toString());
-        console.log('User ' + socket.id + ' is connected to room: ' + room[i].room);
-    }
+    socket.on('sendRoom', (data) => {
+        if (room[i].id.length === 2) {
+            i++;
+            if (roomExists(data)) {
+                socket.emit('roomFull', 'Room Full!');
+                room.push({
+                    room: '',
+                    id: []
+                });
+            } else {
+                room.push({
+                    room: data,
+                    id: [socket.id]
+                });
+            }
+        } else {
+            room[i].room = data;
+            room[i].id.push(socket.id);
+            socket.join(data);
+            console.log('User ' + socket.id + ' is connected to room: ' + room[i].room);
+        }
+        console.log(room);
+    });
     socket.on('sendChoice', (data) => {
-        socket.to(getRoom(socket, room)).emit('receiveChoice', data);
+        socket.to(data.key).emit('receiveChoice', data);
     });
     socket.on('sendMatrix', (data) => {
-        socket.to(getRoom(socket, room)).emit('receiveMatrix', data);
+        socket.to(data.key).emit('receiveMatrix', data);
     });
     socket.on('reload', (data) => {
-        socket.to(getRoom(socket, room)).emit('reload', data);
+        socket.to(data.key).emit('reload', data);
     });
     socket.on('disconnect', () => {
        console.log('User ' + socket.id + ' is disconnected');
