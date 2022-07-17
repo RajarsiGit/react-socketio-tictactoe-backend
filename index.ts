@@ -36,7 +36,7 @@ app.get('/', (_req, res) => {
 });
 
 io.on('connection', socket => {
-    console.log('User ' + socket.id + ' is trying to connect...')
+    console.log('User ' + socket.id + ' is trying to connect')
     socket.on('sendRoom', (data) => {
         if (room[i].id.length === 2) {
             i++;
